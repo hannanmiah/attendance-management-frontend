@@ -16,10 +16,12 @@ const table = useTemplateRef("table");
 const page = ref(1);
 const search = ref("");
 const classFilter = ref("");
+const selectedStudent = ref();
+const deleteModalOpen = ref(false);
 
 const columnVisibility = ref();
 
-const { data: students, status } = await useLazySanctumFetch<{
+const { data: students, status,refresh } = await useLazySanctumFetch<{
   data: Student[];
 }>(
   "/api/students",
@@ -42,13 +44,13 @@ function getRowItems(row: Row<User>) {
       label: "Actions",
     },
     {
-      label: "Copy customer ID",
+      label: "Copy student ID",
       icon: "i-lucide-copy",
       onSelect() {
         navigator.clipboard.writeText(row.original.id.toString());
         toast.add({
           title: "Copied to clipboard",
-          description: "Customer ID copied to clipboard",
+          description: "Student ID copied to clipboard",
         });
       },
     },
@@ -56,25 +58,26 @@ function getRowItems(row: Row<User>) {
       type: "separator",
     },
     {
-      label: "View customer details",
-      icon: "i-lucide-list",
-    },
-    {
-      label: "View customer payments",
-      icon: "i-lucide-wallet",
+      label: "Edit Student",
+      icon: "i-lucide-pencil",
+      onSelect() {
+        selectedStudent.value = row.original;
+        toast.add({
+          title: "Customer edited",
+          description: "The customer has been edited.",
+        });
+      },
     },
     {
       type: "separator",
     },
     {
-      label: "Delete customer",
+      label: "Delete Student",
       icon: "i-lucide-trash",
       color: "error",
       onSelect() {
-        toast.add({
-          title: "Customer deleted",
-          description: "The customer has been deleted.",
-        });
+        deleteModalOpen.value = true;
+        selectedStudent.value = row.original;
       },
     },
   ];
@@ -176,7 +179,7 @@ const columns: TableColumn<Student>[] = [
         </template>
 
         <template #right>
-          <CustomersAddModal />
+          <StudentAddModal @added="refresh" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -191,25 +194,12 @@ const columns: TableColumn<Student>[] = [
         />
 
         <div class="flex flex-wrap items-center gap-1.5">
-          <CustomersDeleteModal
-            :count="table?.tableApi?.getFilteredSelectedRowModel().rows.length"
+          <LazyStudentDeleteModal
+            v-model="deleteModalOpen"
+            :student="selectedStudent"
+            @deleted="refresh"
           >
-            <UButton
-              v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length"
-              label="Delete"
-              color="error"
-              variant="subtle"
-              icon="i-lucide-trash"
-            >
-              <template #trailing>
-                <UKbd>
-                  {{
-                    table?.tableApi?.getFilteredSelectedRowModel().rows.length
-                  }}
-                </UKbd>
-              </template>
-            </UButton>
-          </CustomersDeleteModal>
+          </LazyStudentDeleteModal>
 
           <USelect
             v-model="classFilter"
