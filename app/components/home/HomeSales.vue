@@ -1,47 +1,21 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
-import type { Period, Range, Sale } from '~/types'
+import type { Attendance } from '~/types'
 
-const props = defineProps<{
-  period: Period
-  range: Range
-}>()
+const client = useSanctumClient()
 
 const UBadge = resolveComponent('UBadge')
 
-const sampleEmails = [
-  'james.anderson@example.com',
-  'mia.white@example.com',
-  'william.brown@example.com',
-  'emma.davis@example.com',
-  'ethan.harris@example.com'
-]
-
-const { data } = await useAsyncData('sales', async () => {
-  const sales: Sale[] = []
-  const currentDate = new Date()
-
-  for (let i = 0; i < 5; i++) {
-    const hoursAgo = randomInt(0, 48)
-    const date = new Date(currentDate.getTime() - hoursAgo * 3600000)
-
-    sales.push({
-      id: (4600 - i).toString(),
-      date: date.toISOString(),
-      status: randomFrom(['paid', 'failed', 'refunded']),
-      email: randomFrom(sampleEmails),
-      amount: randomInt(100, 1000)
-    })
-  }
-
-  return sales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-}, {
-  watch: [() => props.period, () => props.range],
-  default: () => []
+const { data: recentAttendances } = await useAsyncData<{ data: Attendance[] }>('recent-attendances', () => {
+  return client('/api/attendances', {
+    params: {
+      per_page: 5
+    }
+  })
 })
 
-const columns: TableColumn<Sale>[] = [
+const columns: TableColumn<Attendance>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
@@ -65,9 +39,9 @@ const columns: TableColumn<Sale>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const color = {
-        paid: 'success' as const,
-        failed: 'error' as const,
-        refunded: 'neutral' as const
+        present: 'success' as const,
+        absent: 'error' as const,
+        late: 'warning' as const
       }[row.getValue('status') as string]
 
       return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
@@ -76,21 +50,20 @@ const columns: TableColumn<Sale>[] = [
     }
   },
   {
-    accessorKey: 'email',
-    header: 'Email'
+    accessorKey: 'student.name',
+    header: 'Student'
   },
   {
-    accessorKey: 'amount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
+    accessorKey: 'created_at',
+    header: 'Created',
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue('amount'))
-
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EUR'
-      }).format(amount)
-
-      return h('div', { class: 'text-right font-medium' }, formatted)
+      return new Date(row.getValue('created_at')).toLocaleString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
     }
   }
 ]
@@ -98,7 +71,7 @@ const columns: TableColumn<Sale>[] = [
 
 <template>
   <UTable
-    :data="data"
+    :data="recentAttendances?.data"
     :columns="columns"
     class="shrink-0"
     :ui="{

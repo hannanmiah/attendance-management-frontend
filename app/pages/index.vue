@@ -1,29 +1,34 @@
 <script setup lang="ts">
-import { sub } from 'date-fns'
-import type { DropdownMenuItem } from '@nuxt/ui'
-import type { Period, Range } from '~/types'
+import { sub } from "date-fns";
+import type { DropdownMenuItem } from "@nuxt/ui";
+import type { Period, Range } from "~/types";
 
 definePageMeta({
-  middleware: 'sanctum:auth'
-})
+  middleware: "sanctum:auth",
+});
 
-const { isNotificationsSlideoverOpen } = useDashboard()
+const { isNotificationsSlideoverOpen } = useDashboard();
 
-const items = [[{
-  label: 'New mail',
-  icon: 'i-lucide-send',
-  to: '/inbox'
-}, {
-  label: 'New customer',
-  icon: 'i-lucide-user-plus',
-  to: '/customers'
-}]] satisfies DropdownMenuItem[][]
+const items = [
+  [
+    {
+      label: "New Student",
+      icon: "i-lucide-user-plus",
+      to: "/students",
+    },
+    {
+      label: "New Attendance",
+      icon: "i-lucide-clock",
+      to: "/attendances",
+    },
+  ],
+] satisfies DropdownMenuItem[][];
 
 const range = shallowRef<Range>({
   start: sub(new Date(), { days: 14 }),
-  end: new Date()
-})
-const period = ref<Period>('daily')
+  end: new Date(),
+});
+const period = ref<Period>("daily");
 </script>
 
 <template>
@@ -65,9 +70,9 @@ const period = ref<Period>('daily')
     </template>
 
     <template #body>
-      <HomeStats :period="period" :range="range" />
+      <HomeStats />
       <HomeChart :period="period" :range="range" />
-      <HomeSales :period="period" :range="range" />
+      <HomeSales />
     </template>
   </UDashboardPanel>
 </template>
