@@ -26,27 +26,11 @@ const links = [
     },
     {
       label: "Attendance",
-      to: "/attendances",
+      to: "/attendances/new",
       icon: "i-lucide-clock",
-      defaultOpen: true,
-      type: "trigger",
-      children: [
-        {
-          label: "List",
-          to: "/attendances",
-          exact: true,
-          onSelect: () => {
-            open.value = false;
-          },
-        },
-        {
-          label: "Add Attendance",
-          to: "/attendances/new",
-          onSelect: () => {
-            open.value = false;
-          },
-        },
-      ],
+      onSelect: () => {
+        open.value = false;
+      },
     },
   ],
 ] satisfies NavigationMenuItem[][];
