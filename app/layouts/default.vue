@@ -26,14 +26,14 @@ const links = [
     },
     {
       label: "Attendance",
-      to: "/settings",
-      icon: "i-lucide-settings",
+      to: "/attendances",
+      icon: "i-lucide-clock",
       defaultOpen: true,
       type: "trigger",
       children: [
         {
           label: "List",
-          to: "/settings",
+          to: "/attendances",
           exact: true,
           onSelect: () => {
             open.value = false;
@@ -41,7 +41,7 @@ const links = [
         },
         {
           label: "Add Attendance",
-          to: "/settings/members",
+          to: "/attendances/new",
           onSelect: () => {
             open.value = false;
           },
