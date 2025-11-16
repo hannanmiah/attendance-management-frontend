@@ -18,8 +18,8 @@ const links = [
     },
     {
       label: "Student",
-      icon: "i-lucide-inbox",
-      to: "/inbox",
+      icon: "i-lucide-circle-user",
+      to: "/students",
       onSelect: () => {
         open.value = false;
       },
@@ -32,7 +32,7 @@ const links = [
       type: "trigger",
       children: [
         {
-          label: "General",
+          label: "List",
           to: "/settings",
           exact: true,
           onSelect: () => {
@@ -40,7 +40,7 @@ const links = [
           },
         },
         {
-          label: "Members",
+          label: "Add Attendance",
           to: "/settings/members",
           onSelect: () => {
             open.value = false;

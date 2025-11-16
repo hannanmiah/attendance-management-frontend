@@ -14,6 +14,28 @@ export interface User {
   updated_at: string
 }
 
+export interface Student {
+  id: number
+  student_id: string
+  name: string
+  class: string
+  section: string
+  photo?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Attendance {
+  id: number
+  student_id: string
+  date: string
+  status: 'present' | 'absent' | 'late'
+  note?: string
+  recorded_by: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Mail {
   id: number
   unread?: boolean
